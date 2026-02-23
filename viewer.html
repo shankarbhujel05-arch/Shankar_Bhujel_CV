@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<!--
+  ================================================================
+  viewer.html — PDF Project Viewer
+  ================================================================
+  You do NOT need to edit this file ever.
+  It is shared by ALL projects automatically.
+
+  How it works:
+    When a project card is clicked, the URL looks like this:
+    viewer.html?file=my-project.pdf&title=My+Project+Title
+
+    This page reads that URL, shows the title in the nav bar,
+    and displays the PDF fullscreen — view only, no download button.
+
+  Your only job is:
+    1. Upload PDF to the "projects/" folder on GitHub
+    2. Add a card in index.html with the correct filename
+  ================================================================
+-->
+
+<title>Project Viewer — Shankar Bhujel</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    font-family: 'Segoe UI', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TOP NAV BAR ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 52px;
+    background: #161b22;
+    border-bottom: 1px solid #2d3748;
+    flex-shrink: 0;
+    gap: 1rem;
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #8b949e;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  .back-btn:hover { color: #e8a045; }
+
+  .proj-title-bar {
+    color: #e6edf3;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .view-only-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8b949e;
+    background: #1e2733;
+    border: 1px solid #2d3748;
+    padding: 0.25rem 0.65rem;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ── PDF IFRAME ── */
+  /*
+    #toolbar=0  → hides the browser's built-in PDF toolbar
+                  (removes the download button in most browsers)
+    height is set to fill remaining screen space
+  */
+  #pdfViewer {
+    width: 100%;
+    flex: 1;
+    border: none;
+    background: #1a1a2e;
+  }
+
+  /* ── ERROR MESSAGE (shown if no PDF file found) ── */
+  #errorMsg {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: #8b949e;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  #errorMsg .error-icon { font-size: 3rem; }
+  #errorMsg .error-title { font-size: 1.1rem; font-weight: 600; color: #e6edf3; }
+  #errorMsg .error-desc { font-size: 0.85rem; max-width: 400px; line-height: 1.6; }
+  #errorMsg code {
+    background: #1e2733;
+    border: 1px solid #2d3748;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    color: #e8a045;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav>
+  <!-- Back button — always goes back to the Projects section -->
+  <a href="../index.html#projects" class="back-btn">← Projects</a>
+
+  <!-- Project title — filled automatically from the URL -->
+  <div class="proj-title-bar" id="projTitle">Loading...</div>
+
+  <!-- View-only badge -->
+  <div class="view-only-badge">👁 View Only</div>
+</nav>
+
+<!-- PDF displayed here — no download toolbar -->
+<iframe
+  id="pdfViewer"
+  allowfullscreen
+  title="Project Report"
+></iframe>
+
+<!-- Shown only if the file parameter is missing from URL -->
+<div id="errorMsg">
+  <div class="error-icon">📄</div>
+  <div class="error-title">No PDF file specified</div>
+  <div class="error-desc">
+    This viewer needs a file to open. Make sure your project card
+    in <code>index.html</code> has the correct link format:<br/><br/>
+    <code>viewer.html?file=your-file.pdf&title=Your+Title</code>
+  </div>
+</div>
+
+<script>
+  // ================================================================
+  // This script reads the URL parameters automatically.
+  // You do NOT need to edit anything here.
+  //
+  // It reads two things from the URL:
+  //   ?file=your-project.pdf   → the PDF to show
+  //   &title=Your+Project      → the title in the nav bar
+  //
+  // #toolbar=0 at the end of the src hides the browser PDF toolbar
+  // which removes the download button in Chrome, Edge, and Firefox.
+  // ================================================================
+
+  const params = new URLSearchParams(window.location.search);
+  const file   = params.get('file');
+  const title  = params.get('title');
+
+  // Set the title in the nav bar
+  if (title) {
+    document.getElementById('projTitle').textContent = decodeURIComponent(title);
+    document.title = decodeURIComponent(title) + ' — Shankar Bhujel';
+  }
+
+  // Load the PDF if file param exists
+  if (file) {
+    // #toolbar=0 hides download button in most browsers
+    document.getElementById('pdfViewer').src = file + '#toolbar=0&navpanes=0';
+  } else {
+    // No file given — show error message instead
+    document.getElementById('pdfViewer').style.display = 'none';
+    document.getElementById('errorMsg').style.display  = 'flex';
+  }
+</script>
+
+</body>
+</html>
